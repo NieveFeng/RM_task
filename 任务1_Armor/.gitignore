@@ -1,0 +1,10 @@
+.vscode
+build
+Camera
+*.avi
+*.mp4
+*.png
+*.csv
+*.jpg
+data
+hotspot
