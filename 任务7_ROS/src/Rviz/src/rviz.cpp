@@ -1,19 +1,22 @@
 /**
- * @file Armor.cpp
+ * @file rviz.cpp
  * @author 张兆锋 (1294051350@qq.com)
  * @brief 
  * @version 1.0
- * @date 2021-10-04
+ * @date 2021-10-08
  * 
  * @copyright Copyright (c) 2021
  * 
  */
 
-#include <iostream>
-#include <opencv2/highgui.hpp>
-#include <opencv2/imgproc.hpp>
-#include <opencv2/core.hpp>
+#include <ros/ros.h>
+#include <visualization_msgs/Marker.h>
+#include <image_transport/image_transport.h>
+#include <opencv2/highgui/highgui.hpp>
 #include <opencv2/calib3d.hpp>
+#include <cv_bridge/cv_bridge.h>
+#include <stdio.h>
+#include <iostream>
 
 using namespace cv;
 using namespace std;
@@ -42,20 +45,36 @@ vector<Point3d> world_points = {Point3d(0, 0, 0),
 
 Point2f point_rect[4];	  //旋转矩形的四个顶点
 
-int main()
+int main(int argc, char **argv)
 {
-	VideoCapture capture;
-	capture.open("装甲板_1.avi");
-	if (!capture.isOpened())
-	{
-		cout << "视频无了" << endl;
-	}
+    VideoCapture capture;
+    capture.open("/home/nieve/feng/test/装甲板_1.avi");
+    if (!capture.isOpened())
+    {
+        cout << "视频无了" << endl;
+    }
 
-	//退出程序按Esc
-	while (capture.read(src) || !src.empty() || waitKey(0) != 27)
-	{
+    ros::init(argc, argv, "image_publisher");
+    ros::NodeHandle nh;
+    image_transport::ImageTransport it(nh);
+    image_transport::Publisher pub = it.advertise("src", 1);
 
-		vector<Point> g_rect; //轮廓的二维点集
+    ros::NodeHandle n;
+    ros::Rate r(1);
+    ros::Publisher marker_pub = n.advertise<visualization_msgs::Marker>("visualization_marker", 1);
+
+    uint32_t shape = visualization_msgs::Marker::CUBE;
+
+    while (ros::ok()||capture.read(src) || !src.empty() || waitKey(0) != 27)
+    {
+        sensor_msgs::ImagePtr msg = cv_bridge::CvImage(std_msgs::Header(), "bgr8", src).toImageMsg();
+
+        capture.read(src);
+        if (src.empty())
+        {
+            printf("open error\n");
+        }
+        		vector<Point> g_rect; //轮廓的二维点集
 		if (src.empty())
 		{
 			cout << "帧无了" << endl;
@@ -162,12 +181,44 @@ int main()
 		cout << "x轴角:" << thetax << endl;
 		cout << "y轴角:" << thetay << endl;
 		cout << "z轴角:" << thetaz << endl;
+        pub.publish(msg);
 
-		imshow("视频", src);
-		waitKey(5);
-	}
+        ros::Rate loop_rate(5);
 
-	cout << "\n识别完成！" << endl;
-	return 0;
+        visualization_msgs::Marker marker;
+
+        marker.header.frame_id = "armor";
+        marker.header.stamp = ros::Time::now();
+
+        marker.ns = "image_publisher";
+        marker.id = 0;
+
+        marker.type = shape;
+
+        marker.action = visualization_msgs::Marker::ADD;
+
+        marker.pose.position.x = 0;
+        marker.pose.position.y = (500-tevc.at<double>(2,0))*0.01;
+        marker.pose.position.z = 1;
+        marker.pose.orientation.x = thetax;
+        marker.pose.orientation.y = thetay;
+        marker.pose.orientation.z = thetaz;
+        marker.pose.orientation.w = 1.0;
+
+        marker.scale.x = 0.675;
+        marker.scale.y = 0.1;
+        marker.scale.z = 0.265;
+
+        marker.color.r = 1.0f;
+        marker.color.g = 0.0f;
+        marker.color.b = 0.0f;
+        marker.color.a = 1.0; //透明度
+
+        marker.lifetime = ros::Duration();
+
+        marker_pub.publish(marker);
+        
+        ros::spinOnce();
+        loop_rate.sleep();
+    }
 }
-

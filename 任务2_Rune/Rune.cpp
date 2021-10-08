@@ -48,10 +48,10 @@ int main()
 
 
 		//二值化图像
-		threshold(src_gray, dst_two, 100, 255, 0);
+		threshold(src_gray, dst_two, 40, 255, 0);
 
 		Mat kernel = getStructuringElement(cv::MORPH_RECT, Size(3, 3));
-		dilate(dst_two, dst_two, kernel, Point(-1, -1), 1);
+		//dilate(dst_two, dst_two, kernel, Point(-1, -1), 1);
 		morphologyEx(dst_two, dst_two, MORPH_CLOSE, kernel, Point(-1, -1), 4);
 
 		findContours(dst_two, g_contours, g_hierarchy,
@@ -87,12 +87,7 @@ int main()
 				RotatedRect right_Rec = minAreaRect(g_contours[i]);
 				circle(src, right_Rec.center, 1, Scalar(0, 255, 255), 2);
 			}
-
-			//drawContours(src, g_contours, i, Scalar(0, 0, 255),
-			//	2, 8, g_hierarchy, 0, Point(0, 0));
 		}
-
-		
 
 		namedWindow("视频",WINDOW_AUTOSIZE);		//命名窗口
 		moveWindow("视频", 400, 200);			//移动窗口

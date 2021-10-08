@@ -1,0 +1,2 @@
+Rviz
+-DCATKIN_DEVEL_PREFIX=/home/nieve/feng/RM_task/任务7_ROS/devel -DCMAKE_INSTALL_PREFIX=/home/nieve/feng/RM_task/任务7_ROS/install -G Unix Makefiles
