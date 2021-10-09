@@ -33,10 +33,10 @@ Mat_<double> dist_coeffs = (Mat_<double>(1, 5) << -6.3687295852461456e-01, -1.97
 							3.0970703651800782e-02, 2.1944646842516919e-03, 0.);
 
 // 输入物体上的点
-vector<Point3d> world_points = {Point3d(0, 0, 0),
-								Point3d(0, 26.5, 0),
-								Point3d(67.5, 26.5, 0),
-								Point3d(67.5, 0, 0)};
+vector<Point3f> world_points = {Point3f(0, 0, 0),
+								Point3f(0, 26.5, 0),
+								Point3f(67.5, 26.5, 0),
+								Point3f(67.5, 0, 0)};
 
 Point2f point_rect[4]; //旋转矩形的四个顶点
 
@@ -124,17 +124,13 @@ int main()
 		line(src, point_rect[1], point_rect[3], Scalar(255, 0, 0), 3);
 		circle(src, rotated_rect.center, 3, Scalar(0, 255, 0), 5);
 
-		cout << "O点：" << point_rect[0].x << endl;
-		cout << "1点：" << point_rect[1].x << endl;
-		cout << "2点：" << point_rect[2].x << endl;
-		cout << "3点：" << point_rect[3].x << endl;
-
 		Point2f point_order[3];
 		for (int i = 1; i < 4; i++)
 		{
 			if (abs(point_rect[0].x - point_rect[i].x) < 20)
 			{
-				cout<<abs(point_rect[0].x - point_rect[i].x)<<endl;
+				Point2f point_tmp[2];
+				cout << abs(point_rect[0].x - point_rect[i].x) << endl;
 				point_order[0] = point_rect[0];
 				point_order[1] = point_rect[i];
 				if (i == 1)
@@ -152,19 +148,45 @@ int main()
 					point_order[2] = point_rect[1];
 					point_order[3] = point_rect[2];
 				}
+				if (point_order[0].x > point_order[2].x)
+				{
+					point_tmp[0] = point_order[0];
+					point_tmp[1] = point_order[1];
+					point_order[0] = point_order[2];
+					point_order[1] = point_order[3];
+					point_order[2] = point_tmp[0];
+					point_order[3] = point_tmp[1];
+				}
+				if (point_order[0].y < point_order[1].y)
+				{
+					point_tmp[0] = point_order[0];
+					point_order[0] = point_order[1];
+					point_order[1] = point_tmp[0];
+				}
+				if (point_order[3].y < point_order[2].y)
+				{
+					point_tmp[2] = point_order[2];
+					point_order[2] = point_order[3];
+					point_order[3] = point_tmp[2];
+				}
 			}
 		}
 
 		//图像上的点
-		vector<Point2d> src_points = {Point2d(point_order[0].x, point_order[0].y),
-									  Point2d(point_order[1].x, point_order[1].y),
-									  Point2d(point_order[2].x, point_order[2].y),
-									  Point2d(point_order[3].x, point_order[3].y)};
+		vector<Point2f> src_points = {Point2f(point_order[0].x, point_order[0].y),
+									  Point2f(point_order[1].x, point_order[1].y),
+									  Point2f(point_order[2].x, point_order[2].y),
+									  Point2f(point_order[3].x, point_order[3].y)};
 
-		cout << "O点：" << point_order[0].x << endl;
-		cout << "1点：" << point_order[1].x << endl;
-		cout << "2点：" << point_order[2].x << endl;
-		cout << "3点：" << point_order[3].x << endl;
+		cout << "O点x：" << point_order[0].x << endl;
+		cout << "O点y：" << point_order[0].y << endl;
+		cout << "1点x：" << point_order[1].x << endl;
+		cout << "1点y：" << point_order[1].y << endl;
+		cout << "2点x：" << point_order[2].x << endl;
+		cout << "2点y：" << point_order[2].y << endl;
+		cout << "3点x：" << point_order[3].x << endl;
+		cout << "3点y：" << point_order[3].y << endl;
+
 		Mat revc, tevc, revc_matrix;
 
 		solvePnP(world_points, src_points, camera_matrix, dist_coeffs, revc, tevc, false, 2);

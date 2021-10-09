@@ -148,6 +148,7 @@ int main(int argc, char **argv)
         {
             if (abs(point_rect[0].x - point_rect[i].x) < 20)
             {
+                Point2f point_tmp[2];
                 cout << abs(point_rect[0].x - point_rect[i].x) << endl;
                 point_order[0] = point_rect[0];
                 point_order[1] = point_rect[i];
@@ -168,13 +169,24 @@ int main(int argc, char **argv)
                 }
                 if (point_order[0].x > point_order[2].x)
                 {
-                    Point2f point_tmp[2];
-                    point_tmp[0]=point_order[0];
-                    point_tmp[1]=point_order[1];
+                    point_tmp[0] = point_order[0];
+                    point_tmp[1] = point_order[1];
                     point_order[0] = point_order[2];
                     point_order[1] = point_order[3];
                     point_order[2] = point_tmp[0];
                     point_order[3] = point_tmp[1];
+                }
+                if (point_order[0].y < point_order[1].y)
+                {
+                    point_tmp[0] = point_order[0];
+                    point_order[0] = point_order[1];
+                    point_order[1] = point_tmp[0];
+                }
+                if (point_order[3].y < point_order[2].y)
+                {
+                    point_tmp[2] = point_order[2];
+                    point_order[2] = point_order[3];
+                    point_order[3] = point_tmp[2];
                 }
             }
         }
@@ -185,10 +197,14 @@ int main(int argc, char **argv)
                                       Point2f(point_order[2].x, point_order[2].y),
                                       Point2f(point_order[3].x, point_order[3].y)};
 
-        cout << "O点：" << point_order[0].x << endl;
-        cout << "1点：" << point_order[1].x << endl;
-        cout << "2点：" << point_order[2].x << endl;
-        cout << "3点：" << point_order[3].x << endl;
+        cout << "O点x：" << point_order[0].x << endl;
+        cout << "O点y：" << point_order[0].y << endl;
+        cout << "1点x：" << point_order[1].x << endl;
+        cout << "1点y：" << point_order[1].y << endl;
+        cout << "2点x：" << point_order[2].x << endl;
+        cout << "2点y：" << point_order[2].y << endl;
+        cout << "3点x：" << point_order[3].x << endl;
+        cout << "3点y：" << point_order[3].y << endl;
 
         Mat revc, tevc, revc_matrix;
 
@@ -200,7 +216,6 @@ int main(int argc, char **argv)
         p = -revc_matrix.inv() * tevc;
         cout << "相机世界坐标:" << endl
              << p << endl;
-        cout << "深度:" << tevc.at<double>(2, 0) << endl;
 
         double r11 = revc_matrix.ptr<double>(0)[0];
         double r12 = revc_matrix.ptr<double>(0)[1];
@@ -223,7 +238,7 @@ int main(int argc, char **argv)
         cout << "z轴角:" << thetaz << endl;
         pub.publish(msg);
 
-        ros::Rate loop_rate(5);
+        ros::Rate loop_rate(10);
 
         visualization_msgs::Marker marker;
 
@@ -237,7 +252,11 @@ int main(int argc, char **argv)
 
         marker.action = visualization_msgs::Marker::ADD;
 
-        marker.pose.position.x = 0;
+        cout << "深度:" << tevc.at<double>(2, 0) << endl;
+        cout << "上下：" << tevc.at<double>(1, 0) << endl;
+        cout << "左右：" << tevc.at<double>(0, 0) << endl;
+
+        marker.pose.position.x = tevc.at<double>(0, 0)*0.01;
         marker.pose.position.y = (500 - tevc.at<double>(2, 0)) * 0.01;
         marker.pose.position.z = 1;
         marker.pose.orientation.x = thetax;
