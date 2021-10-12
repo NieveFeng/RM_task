@@ -115,9 +115,7 @@ int main()
 
 		//绘制矩形
 		for (int i = 0; i < 4; i++)
-		{
 			line(src, point_rect[i], point_rect[(i + 1) % 4], Scalar(0, 0, 255), 3);
-		}
 
 		//绘制对角线and中心点
 		line(src, point_rect[0], point_rect[2], Scalar(255, 0, 0), 3);
