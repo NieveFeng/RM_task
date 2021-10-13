@@ -20,35 +20,34 @@ def _read(image, label):
     minist_dir = '/home/nieve/feng/RM_task/任务8_Learning/data/'
     with gzip.open(minist_dir + label) as flbl:
         magic, num = struct.unpack(">II", flbl.read(8))
-        label = np.fromstring(flbl.read(), dtype=np.int8)
+        label = np.frombuffer(flbl.read(), dtype=np.int8)
     with gzip.open(minist_dir + image, 'rb') as fimg:
         magic, num, rows, cols = struct.unpack(">IIII", fimg.read(16))
-        image = np.fromstring(fimg.read(), 
-        dtype=np.uint8).reshape(len(label), rows, cols)
+        image = np.frombuffer(fimg.read(), dtype=np.int8)
     return image, label
 
 # 读取数据
 def get_data():
-    [train_img, train_label] = _read(
+    train_img, train_label = _read(
         'train-images-idx3-ubyte.gz',
         'train-labels-idx1-ubyte.gz')
 
-    [test_img, test_label] = _read(
+    test_img, test_label = _read(
         't10k-images-idx3-ubyte.gz',
         't10k-labels-idx1-ubyte.gz')
     return train_img, train_label, test_img, test_label
 
 # 获取数据
-X, y, Xt, yt = get_data()
+x, y, xt, yt = get_data()
 
-train_x, train_y = torch.from_numpy(
-    X.reshape(-1, 1, 28, 28)).float(), torch.from_numpy(y.astype(int))
-test_x, test_y = [torch.from_numpy(
-    Xt.reshape(-1, 1, 28, 28)).float(), torch.from_numpy(yt.astype(int))]
+train_x, train_y = [torch.LongTensor(x.reshape(-1, 1, 28, 28)).float(), 
+                    torch.LongTensor(y.astype(int))]
+test_x, test_y =   [torch.LongTensor(xt.reshape(-1, 1, 28, 28)).float(), 
+                    torch.LongTensor(yt.astype(int))]
 
 # 封装好数据和标签
-train_dataset = TensorDataset(data_tensor=train_x, target_tensor=train_y)
-test_dataset = TensorDataset(data_tensor=test_x, target_tensor=test_y)
+train_dataset = TensorDataset(train_x, train_y)
+test_dataset = TensorDataset(test_x, test_y)
 
 # 定义数据加载器
 train_loader = DataLoader(dataset=train_dataset,
@@ -146,7 +145,7 @@ def train(epoch):
         if batch_idx % 100 == 0:
             print('Train Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}'.format(
                 epoch, batch_idx * len(data), len(train_loader.dataset),
-                100. * batch_idx / len(train_loader), loss.data[0]))
+                100. * batch_idx / len(train_loader), loss.item()))
 
 # 定义测试函数
 def test():
@@ -160,7 +159,7 @@ def test():
         data, target = Variable(data, volatile=True), Variable(target)
         output = model(data)
         # 计算总的损失
-        test_loss += criterion(output, target).data[0]
+        test_loss += criterion(output, target).item()
         pred = output.data.max(1, keepdim=True)[1]  # 获得得分最高的类别
         correct += pred.eq(target.data.view_as(pred)).cpu().sum()
 
@@ -178,7 +177,7 @@ else:
     print('USE CPU')
 
 # 定义代价函数，使用交叉熵验证
-criterion = nn.CrossEntropyLoss(size_average=False)
+criterion = nn.CrossEntropyLoss(reduction='sum')
 # 直接定义优化器，而不是调用backward
 optimizer = torch.optim.Adam(model.parameters(), lr=0.001, betas=(0.9, 0.99))
 
@@ -187,11 +186,11 @@ model.apply(weight_init)
 
 if __name__=="__main__":
 # 调用函数执行训练和测试
-    for epoch in range(1, 501):
-        print('----------------start train-----------------')
+    for epoch in range(1, 8):
+        print('\n'+'----------------start train-----------------'+'\n')
         train(epoch)
-        print('----------------end train-----------------')
+        print('\n'+'----------------end train-------------------'+'\n')
 
-        print('----------------start test-----------------')
+        print('----------------start test------------------')
         test()
-        print('----------------end test-----------------')
+        print('---------------end test---------------------')
