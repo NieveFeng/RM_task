@@ -36,6 +36,12 @@ RM实习期任务整理汇总
 
 ## 任务5_Serial
 
+**主程序存放于 <u>任务5_serial/src/serial/examples/serial_example.cc</u>**
+
+1. 导入ROS关键的serial包
+2. 对收到的数据进行判断分析
+3. 使用包里write和read函数实现串口收发
+
 ## 任务6_PNP
 
 1. 对任务一绘制的最小旋转矩形的四个顶点进行简单的排序
@@ -57,3 +63,6 @@ RM实习期任务整理汇总
 1. 导入一系列关键功能包cv_bridge,image_transport等等
 2. 引入任务六得出的世界坐标系，xyz轴角，姿态估算
 3. 理解marker成员变量含义，赋值变量
+
+## 任务8_Learning
+
