@@ -36,7 +36,7 @@ RM实习期任务整理汇总
 
 ## 任务5_Serial
 
-**主程序存放于 <u>任务5_serial/src/serial/examples/serial_example.cc</u>**
+**主程序存放于 <u>任务5_serial/src/serial.cpp</u>**
 
 1. 导入ROS关键的serial包
 2. 对收到的数据进行判断分析
