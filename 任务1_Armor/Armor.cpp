@@ -50,6 +50,7 @@ int main()
 		namedWindow("视频", WINDOW_AUTOSIZE); //命名窗口
 		moveWindow("视频", 200, 60);		  //移动窗口
 
+		//分离三通道，通道相减获取红色灯条
 		split(src, channels);
 		src_gray = channels[2] - channels[0];
 
@@ -70,9 +71,11 @@ int main()
 			cout << i << endl;
 			cout << "A" << light_area << endl;
 
+			//筛除条件：轮廓面积大小
 			if (light_area < 300)
 				continue;
 
+			//打印最小旋转矩形成员参数
 			cout << "P:" << light_rec.size.aspectRatio() << endl;
 			cout << "J:" << light_rec.angle << endl;
 			cout << "I:" << light_rec.size.area() / light_area << endl;
