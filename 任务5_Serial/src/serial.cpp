@@ -30,6 +30,7 @@ void my_sleep(unsigned long milliseconds)
   usleep(milliseconds * 1000); // 100 ms
 }
 
+//列出当前串口的信息
 void enumerate_ports()
 {
   vector<serial::PortInfo> devices_found = serial::list_ports();
@@ -45,12 +46,14 @@ void enumerate_ports()
   }
 }
 
+//打印错误信息
 void print_usage()
 {
   cerr << "Usage: test_serial {-e|<serial port address>} ";
   cerr << "<baudrate> [test string]" << endl;
 }
 
+//rosrun需要两个参数
 int run(int argc, char **argv)
 {
   if (argc < 2)
@@ -59,9 +62,10 @@ int run(int argc, char **argv)
     return 0;
   }
 
-  // Argument 1 is the serial port or enumerate flag
+  //第一个参数为串口号或者获取串口信息
   string port(argv[1]);
 
+  //-e列出当前串口信息
   if (port == "-e")
   {
     enumerate_ports();
@@ -73,14 +77,17 @@ int run(int argc, char **argv)
     return 1;
   }
 
-  // Argument 2 is the baudrate
+  //第二个参数为波特率
   unsigned long baud = 0;
   sscanf(argv[2], "%lu", &baud);
-  // port, baudrate, timeout in milliseconds
+
+  //串口号，波特率，超时时间
   serial::Serial my_serial(port, baud, serial::Timeout::simpleTimeout(1000));
 
   int count = 0;
   string test_string;
+
+  //第三个参数是打印设定信息，或者打印默认信息
   if (argc == 4)
   {
     test_string = argv[3];
@@ -89,9 +96,13 @@ int run(int argc, char **argv)
   {
     test_string = "Hello RM！";
   }
-  // Test the timeout at 250ms, but asking exactly for what was written
+  //读写规定的超时时间
   my_serial.setTimeout(serial::Timeout::max(), 50, 0, 50, 0);
+
+  //写入串口数据
   size_t bytes_wrote = my_serial.write(test_string);
+
+  //读取串口数据
   result = my_serial.read(test_string.length() + 1);
   cout << "数据长度: " <<result.length() << " , read: " << result << endl;
   return 0;

@@ -122,9 +122,11 @@ int main()
 		line(src, point_rect[1], point_rect[3], Scalar(255, 0, 0), 3);
 		circle(src, rotated_rect.center, 3, Scalar(0, 255, 0), 5);
 
+		//对最小旋转矩形的四个顶点进行简单排序
 		Point2f point_order[3];
 		for (int i = 1; i < 4; i++)
 		{
+			//先找出和第一个点x接近的点，使得order[01]与[23]都是x相近的点
 			if (abs(point_rect[0].x - point_rect[i].x) < 20)
 			{
 				Point2f point_tmp[2];
@@ -146,6 +148,7 @@ int main()
 					point_order[2] = point_rect[1];
 					point_order[3] = point_rect[2];
 				}
+				//根据物体上的点，order[0]是最左边的点x应为最小
 				if (point_order[0].x > point_order[2].x)
 				{
 					point_tmp[0] = point_order[0];
@@ -155,6 +158,7 @@ int main()
 					point_order[2] = point_tmp[0];
 					point_order[3] = point_tmp[1];
 				}
+				//order[0]是左下方的点，y应该在x相近的两点中最大
 				if (point_order[0].y < point_order[1].y)
 				{
 					point_tmp[0] = point_order[0];
