@@ -187,9 +187,9 @@ model.apply(weight_init)
 if __name__=="__main__":
 # 调用函数执行训练和测试
     for epoch in range(1, 8):
-        print('\n'+'----------------start train-----------------'+'\n')
+        print('\n'+'----------------start train-----------------')
         train(epoch)
-        print('\n'+'----------------end train-------------------'+'\n')
+        print('----------------end train-------------------'+'\n')
 
         print('----------------start test------------------')
         test()
