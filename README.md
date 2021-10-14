@@ -66,3 +66,8 @@ RM实习期任务整理汇总
 
 ## 任务8_Learning
 
+**主程序存放于<u>Lenet.py</u>**
+
+1. 采用pytorch搭建Lenet-5神经网络识别手写数字
+2. 数据集在github上clone下来的
+3. 目前运行程序可以开始训练
